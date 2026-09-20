@@ -1,9 +1,12 @@
 import {
+  buildProxyAuthentication,
+  buildProxyWebSocketUrl,
   buildTranslateSetup,
   downsampleTo16k,
   extractGeminiError,
   float32ToPcm16,
   nextCaptionState,
+  parseWebSocketData,
 } from './lib.js';
 
 const apiKeyInput = document.querySelector('#apiKey');
@@ -81,10 +84,6 @@ function pcmBase64(samples) {
   return btoa(binary);
 }
 
-function translateWebSocketUrl(apiKey) {
-  return `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(apiKey)}`;
-}
-
 async function requestDisplayMode() {
   try {
     if (!document.fullscreenElement && captionScreen.requestFullscreen) {
@@ -109,11 +108,23 @@ function releaseWakeLock() {
   state.wakeLock = null;
 }
 
-function handleGeminiMessage(event) {
+async function handleGeminiMessage(event, socket) {
   let message;
   try {
-    message = JSON.parse(event.data);
+    message = await parseWebSocketData(event.data);
   } catch {
+    return;
+  }
+
+  if (message.proxyError?.message) {
+    showError(`Соединение с Gemini не удалось: ${message.proxyError.message}`);
+    stopTranslation();
+    return;
+  }
+
+  if (message.proxyReady) {
+    setStatus('Gemini wird vorbereitet…');
+    socket.send(JSON.stringify(buildTranslateSetup('de')));
     return;
   }
 
@@ -121,6 +132,11 @@ function handleGeminiMessage(event) {
   if (geminiError) {
     showError(`Gemini отклонил запрос: ${geminiError}`);
     stopTranslation();
+    return;
+  }
+
+  if (message.setupComplete) {
+    startMicrophoneAfterSetup(socket);
     return;
   }
 
@@ -175,6 +191,23 @@ async function startMicrophone() {
   state.processor = processor;
 }
 
+async function startMicrophoneAfterSetup(socket) {
+  if (state.socket !== socket || state.microphoneStream) return;
+
+  setStatus('Mikrofon wird gestartet…');
+  try {
+    await startMicrophone();
+    if (state.socket !== socket) {
+      cleanupMedia();
+      return;
+    }
+    setStatus('Übersetzung läuft');
+  } catch (error) {
+    showError(`Микрофон не запущен: ${error.message || 'разреши доступ в Safari.'}`);
+    stopTranslation();
+  }
+}
+
 function cleanupMedia() {
   state.processor?.disconnect();
   state.processor = null;
@@ -221,26 +254,16 @@ async function startTranslation() {
   requestWakeLock();
 
   try {
-    const socket = new WebSocket(translateWebSocketUrl(apiKey));
+    const socket = new WebSocket(buildProxyWebSocketUrl(window.location));
     state.socket = socket;
 
-    socket.addEventListener('open', async () => {
+    socket.addEventListener('open', () => {
       if (state.socket !== socket) return;
-      socket.send(JSON.stringify(buildTranslateSetup('de')));
-      try {
-        await startMicrophone();
-        if (state.socket !== socket) {
-          cleanupMedia();
-          return;
-        }
-        setStatus('Übersetzung läuft');
-      } catch (error) {
-        showError(`Микрофон не запущен: ${error.message || 'разреши доступ в Safari.'}`);
-        stopTranslation();
-      }
+      setStatus('Authentifizierung…');
+      socket.send(JSON.stringify(buildProxyAuthentication(apiKey)));
     });
 
-    socket.addEventListener('message', handleGeminiMessage);
+    socket.addEventListener('message', (event) => handleGeminiMessage(event, socket));
     socket.addEventListener('error', () => {
       if (state.socket === socket) setStatus('Verbindungsfehler');
     });

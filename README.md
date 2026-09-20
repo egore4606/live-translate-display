@@ -1,6 +1,6 @@
 # Live Übersetzung
 
-A minimal iPad-first caption display for a Russian presentation. It streams the iPad microphone directly to Gemini Live Translate and renders the German transcript in very large text. No translated audio is played.
+A minimal iPad-first caption display for a Russian presentation. It streams the iPad microphone through a private relay to Gemini Live Translate and renders the German transcript in very large text. No translated audio is played.
 
 Live page: <https://egore4606.eu/LiveTranslate/>
 
@@ -16,17 +16,19 @@ The page uses `gemini-3.5-live-translate-preview`, Russian audio input, target l
 
 ## Security model
 
-- The site is static: it has no backend, database, analytics, or cookies.
-- The API key is never embedded in source, sent to `egore4606.eu`, written to `localStorage`, or placed in a URL on this site.
-- The browser opens its WebSocket directly to `generativelanguage.googleapis.com`; Google receives the key and microphone stream.
+- The public page has no database, analytics, or cookies.
+- The browser sends the API key as the first message inside the site's encrypted WebSocket connection. It is not embedded in source, written to storage, or placed in any URL.
+- A localhost-only relay forwards the key to Gemini in the required `x-goog-api-key` header and keeps no key or audio logs.
+- Nginx exposes only the relay's WebSocket path through the existing HTTPS virtual host; the Node listener stays on `127.0.0.1`.
 - Browser reload stops the session and clears the page state. Use a dedicated key and apply Google API-key restrictions where available.
-- Response headers disable caching and restrict browser connections to the Gemini WebSocket endpoint.
+- Response headers disable caching and restrict browser connections to the same origin.
 
 ## Local verification
 
 ```bash
 npm test
 node --check src/app.js
+node --check src/proxy.js
 ```
 
-The unit tests cover Gemini session setup, PCM conversion, downsampling, and incremental caption state. A live Gemini session requires a real user API key and microphone permission, so it is intentionally not automated.
+The tests cover the proxy authentication header, message relay, Gemini setup schema, PCM conversion, downsampling, and incremental caption state. The deployed integration was also checked against a real Gemini auth key and Russian speech fixture without persisting the key.

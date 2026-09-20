@@ -1,13 +1,21 @@
 export const GEMINI_MODEL = 'gemini-3.5-live-translate-preview';
 
+export function buildProxyWebSocketUrl(locationLike) {
+  const websocketProtocol = locationLike.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${websocketProtocol}//${locationLike.host}/LiveTranslate/ws`;
+}
+
+export function buildProxyAuthentication(apiKey) {
+  return { authenticate: { apiKey } };
+}
+
 export function buildTranslateSetup(targetLanguageCode = 'de') {
   return {
     setup: {
       model: `models/${GEMINI_MODEL}`,
+      outputAudioTranscription: {},
       generationConfig: {
         responseModalities: ['AUDIO'],
-        inputAudioTranscription: {},
-        outputAudioTranscription: {},
         translationConfig: {
           targetLanguageCode,
           echoTargetLanguage: false,
@@ -19,6 +27,22 @@ export function buildTranslateSetup(targetLanguageCode = 'de') {
 
 export function extractGeminiError(message) {
   return typeof message?.error?.message === 'string' ? message.error.message : null;
+}
+
+export async function parseWebSocketData(data) {
+  let text;
+  if (typeof data === 'string') {
+    text = data;
+  } else if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    text = await data.text();
+  } else if (data instanceof ArrayBuffer) {
+    text = new TextDecoder().decode(data);
+  } else if (ArrayBuffer.isView(data)) {
+    text = new TextDecoder().decode(data);
+  } else {
+    throw new TypeError('Unsupported WebSocket message type');
+  }
+  return JSON.parse(text);
 }
 
 export function float32ToPcm16(samples) {

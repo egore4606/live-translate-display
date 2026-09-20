@@ -1,21 +1,40 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildProxyAuthentication,
+  buildProxyWebSocketUrl,
   buildTranslateSetup,
   downsampleTo16k,
   extractGeminiError,
   float32ToPcm16,
   nextCaptionState,
+  parseWebSocketData,
 } from '../src/lib.js';
 
-test('buildTranslateSetup configures German translated captions', () => {
+test('buildProxyWebSocketUrl keeps credentials out of the URL', () => {
+  assert.equal(
+    buildProxyWebSocketUrl({ protocol: 'https:', host: 'egore4606.eu' }),
+    'wss://egore4606.eu/LiveTranslate/ws',
+  );
+  assert.deepEqual(buildProxyAuthentication('secret-key'), {
+    authenticate: { apiKey: 'secret-key' },
+  });
+});
+
+test('parseWebSocketData handles both text and browser Blob messages', async () => {
+  assert.deepEqual(await parseWebSocketData('{"proxyReady":true}'), { proxyReady: true });
+  assert.deepEqual(await parseWebSocketData(new Blob(['{"setupComplete":{}}'])), {
+    setupComplete: {},
+  });
+});
+
+test('buildTranslateSetup uses the current raw-WebSocket setup schema', () => {
   assert.deepEqual(buildTranslateSetup('de'), {
     setup: {
       model: 'models/gemini-3.5-live-translate-preview',
+      outputAudioTranscription: {},
       generationConfig: {
         responseModalities: ['AUDIO'],
-        inputAudioTranscription: {},
-        outputAudioTranscription: {},
         translationConfig: {
           targetLanguageCode: 'de',
           echoTargetLanguage: false,

@@ -5,5 +5,5 @@ Options -Indexes
   Header always set Referrer-Policy "no-referrer"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Permissions-Policy "camera=(), geolocation=(), payment=(), usb=()"
-  Header always set Content-Security-Policy "default-src 'self'; connect-src 'self' wss://generativelanguage.googleapis.com; style-src 'self'; script-src 'self'; img-src 'self' data:; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; connect-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
 </IfModule>
