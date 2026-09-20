@@ -47,10 +47,11 @@ h1 { margin: 0; font-size: clamp(2.4rem, 8vw, 4.8rem); line-height: .94; letter-
 .connection-status { flex: 1; }
 .header-button { padding: 8px 12px; font-size: .78rem; }
 .stop-button { color: var(--danger); }
-.caption-stage { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.caption-stage { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8dvh 0; }
 .empty-caption { max-width: 900px; color: #63655f; font-size: clamp(1.5rem, 4vw, 4rem); line-height: 1.15; text-align: center; }
-.caption-list { width: min(1600px, 100%); max-height: calc(100dvh - 110px); overflow: hidden; }
-.caption { margin: 0; overflow-wrap: anywhere; text-wrap: balance; text-align: center; font-size: clamp(2.25rem, 7.2vw, 8.8rem); font-weight: 760; letter-spacing: -.055em; line-height: 1.03; }
+.caption-list { width: min(1400px, 92%); height: min(66dvh, 720px); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 3dvh 2vw; }
+.caption-list[hidden] { display: none; }
+.caption { flex: 0 0 auto; margin: 0; overflow-wrap: anywhere; text-wrap: balance; text-align: center; font-size: clamp(2.25rem, 7.2vw, 8.8rem); font-weight: 760; letter-spacing: -.018em; line-height: 1.06; }
 .caption + .caption { margin-top: .32em; }
 .caption.history { color: #777971; font-size: clamp(1.1rem, 3.1vw, 3.7rem); font-weight: 590; }
 .caption.draft { color: var(--text); }
