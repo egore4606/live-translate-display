@@ -1,6 +1,7 @@
 import {
   buildTranslateSetup,
   downsampleTo16k,
+  extractGeminiError,
   float32ToPcm16,
   nextCaptionState,
 } from './lib.js';
@@ -113,6 +114,13 @@ function handleGeminiMessage(event) {
   try {
     message = JSON.parse(event.data);
   } catch {
+    return;
+  }
+
+  const geminiError = extractGeminiError(message);
+  if (geminiError) {
+    showError(`Gemini отклонил запрос: ${geminiError}`);
+    stopTranslation();
     return;
   }
 

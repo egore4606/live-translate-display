@@ -17,6 +17,10 @@ export function buildTranslateSetup(targetLanguageCode = 'de') {
   };
 }
 
+export function extractGeminiError(message) {
+  return typeof message?.error?.message === 'string' ? message.error.message : null;
+}
+
 export function float32ToPcm16(samples) {
   const pcm = new Int16Array(samples.length);
   for (let index = 0; index < samples.length; index += 1) {

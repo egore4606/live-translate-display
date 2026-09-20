@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   buildTranslateSetup,
   downsampleTo16k,
+  extractGeminiError,
   float32ToPcm16,
   nextCaptionState,
 } from '../src/lib.js';
@@ -22,6 +23,11 @@ test('buildTranslateSetup configures German translated captions', () => {
       },
     },
   });
+});
+
+test('extractGeminiError returns the server error message only', () => {
+  assert.equal(extractGeminiError({ error: { message: 'API key not valid' } }), 'API key not valid');
+  assert.equal(extractGeminiError({ serverContent: {} }), null);
 });
 
 test('float32ToPcm16 clamps samples and writes little-endian PCM', () => {
