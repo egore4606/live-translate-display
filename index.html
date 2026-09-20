@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050505">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Live Übersetzung</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="setup-panel" id="setupPanel" aria-labelledby="setupTitle">
+      <p class="eyebrow">РУССКИЙ → DEUTSCH</p>
+      <h1 id="setupTitle">Live-Übersetzung</h1>
+      <p class="setup-copy">Говори по-русски — немецкий перевод появится крупным текстом. Озвучка отключена.</p>
+
+      <label class="key-label" for="apiKey">Gemini API key</label>
+      <div class="key-row">
+        <input id="apiKey" type="password" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza…">
+        <button class="icon-button" id="toggleKey" type="button" aria-label="Показать или скрыть ключ">Показать</button>
+      </div>
+      <p class="security-note">Ключ остаётся только в памяти этого браузера: не сохраняется, не отправляется на этот сайт и не попадает в URL.</p>
+
+      <button class="start-button" id="startButton" type="button">Начать перевод</button>
+      <p class="permission-note">Safari спросит разрешение на микрофон. Для демонстрации поверни iPad экраном к аудитории и включи полноэкранный режим.</p>
+      <p class="error-message" id="errorMessage" role="alert" hidden></p>
+    </section>
+
+    <section class="caption-screen" id="captionScreen" aria-live="polite" aria-label="Немецкий перевод">
+      <div class="screen-header" id="screenHeader">
+        <span class="language-pill">DE</span>
+        <span class="connection-status" id="connectionStatus">Bereit</span>
+        <button class="header-button" id="fullscreenButton" type="button">Vollbild</button>
+        <button class="header-button stop-button" id="stopButton" type="button" hidden>Stopp</button>
+      </div>
+      <div class="caption-stage" id="captionStage">
+        <p class="empty-caption" id="emptyCaption">Der deutsche Text erscheint hier.</p>
+        <div class="caption-list" id="captionList" hidden></div>
+      </div>
+      <p class="screen-hint" id="screenHint">F für Vollbild · Tippe oben auf „Vollbild“</p>
+    </section>
+  </main>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

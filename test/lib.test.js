@@ -1,0 +1,52 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  buildTranslateSetup,
+  downsampleTo16k,
+  float32ToPcm16,
+  nextCaptionState,
+} from '../src/lib.js';
+
+test('buildTranslateSetup configures German translated captions', () => {
+  assert.deepEqual(buildTranslateSetup('de'), {
+    setup: {
+      model: 'models/gemini-3.5-live-translate-preview',
+      generationConfig: {
+        responseModalities: ['AUDIO'],
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
+        translationConfig: {
+          targetLanguageCode: 'de',
+          echoTargetLanguage: false,
+        },
+      },
+    },
+  });
+});
+
+test('float32ToPcm16 clamps samples and writes little-endian PCM', () => {
+  const pcm = float32ToPcm16(new Float32Array([-2, -1, -0.5, 0, 0.5, 1, 2]));
+  assert.deepEqual([...pcm], [-32768, -32768, -16384, 0, 16384, 32767, 32767]);
+});
+
+test('downsampleTo16k averages each source-rate window', () => {
+  const input = new Float32Array([0, 0.2, 0.4, 0.6, 0.8, 1, -1, -0.8]);
+  const output = downsampleTo16k(input, 48000);
+  assert.deepEqual(Array.from(output, (value) => Number(value.toFixed(1))), [0.2, 0.8, -0.9]);
+});
+
+test('nextCaptionState accumulates partial text and commits it on turn completion', () => {
+  let state = { history: [], draft: '' };
+  state = nextCaptionState(state, 'Guten ', false);
+  state = nextCaptionState(state, 'Tag!', false);
+  assert.deepEqual(state, { history: [], draft: 'Guten Tag!' });
+
+  state = nextCaptionState(state, '', true);
+  assert.deepEqual(state, { history: ['Guten Tag!'], draft: '' });
+});
+
+test('nextCaptionState keeps only the latest three finalized captions', () => {
+  let state = { history: ['eins', 'zwei', 'drei'], draft: '' };
+  state = nextCaptionState(state, 'vier', true);
+  assert.deepEqual(state, { history: ['zwei', 'drei', 'vier'], draft: '' });
+});
