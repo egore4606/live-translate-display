@@ -1,4 +1,6 @@
 export const GEMINI_MODEL = 'gemini-3.5-live-translate-preview';
+export const MAX_CAPTION_HISTORY = 3;
+export const MAX_DRAFT_CHARACTERS = 2800;
 
 export function buildProxyWebSocketUrl(locationLike) {
   const websocketProtocol = locationLike.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -74,13 +76,23 @@ export function downsampleTo16k(samples, inputSampleRate) {
 }
 
 export function nextCaptionState(state, chunk, turnComplete) {
-  const draft = `${state.draft}${chunk || ''}`;
-  if (!turnComplete || !draft.trim()) {
+  const combinedDraft = `${state.draft}${chunk || ''}`;
+  const draft = combinedDraft.length > MAX_DRAFT_CHARACTERS
+    ? `…${combinedDraft.slice(-(MAX_DRAFT_CHARACTERS - 1))}`
+    : combinedDraft;
+
+  if (!turnComplete) {
     return { history: state.history, draft };
   }
 
+  if (!draft.trim()) return { history: state.history, draft: '' };
+
   return {
-    history: [...state.history, draft.trim()].slice(-3),
+    history: [...state.history, draft.trim()].slice(-MAX_CAPTION_HISTORY),
     draft: '',
   };
+}
+
+export function scrollCaptionListToLatest(captionList) {
+  captionList.scrollTop = captionList.scrollHeight;
 }

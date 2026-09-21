@@ -7,6 +7,7 @@ import {
   float32ToPcm16,
   nextCaptionState,
   parseWebSocketData,
+  scrollCaptionListToLatest,
 } from './lib.js';
 
 const apiKeyInput = document.querySelector('#apiKey');
@@ -72,6 +73,7 @@ function renderCaptions() {
     paragraph.textContent = line;
     captionList.append(paragraph);
   });
+  scrollCaptionListToLatest(captionList);
 }
 
 function pcmBase64(samples) {

@@ -9,6 +9,7 @@ import {
   float32ToPcm16,
   nextCaptionState,
   parseWebSocketData,
+  scrollCaptionListToLatest,
 } from '../src/lib.js';
 
 test('buildProxyWebSocketUrl keeps credentials out of the URL', () => {
@@ -74,4 +75,40 @@ test('nextCaptionState keeps only the latest three finalized captions', () => {
   let state = { history: ['eins', 'zwei', 'drei'], draft: '' };
   state = nextCaptionState(state, 'vier', true);
   assert.deepEqual(state, { history: ['zwei', 'drei', 'vier'], draft: '' });
+});
+
+test('nextCaptionState retains a bounded fresh tail during a very long German stream', () => {
+  const chunk = 'Die Dolmetschung bleibt auch bei langer fortlaufender Rede sichtbar. ';
+  let state = { history: [], draft: '' };
+
+  for (let index = 0; index < 400; index += 1) {
+    state = nextCaptionState(state, `${index}: ${chunk}`, false);
+  }
+
+  assert.ok(state.draft.length <= 2800);
+  assert.match(state.draft, /399: Die Dolmetschung bleibt auch bei langer fortlaufender Rede sichtbar\. $/);
+  assert.match(state.draft, /^…/);
+  assert.deepEqual(state.history, []);
+});
+
+test('nextCaptionState commits a bounded draft once at turn boundaries without blank captions', () => {
+  let state = { history: ['vorher'], draft: '' };
+  state = nextCaptionState(state, 'Ein sehr langer ', false);
+  state = nextCaptionState(state, 'Satz endet jetzt.', true);
+
+  assert.deepEqual(state, { history: ['vorher', 'Ein sehr langer Satz endet jetzt.'], draft: '' });
+
+  state = nextCaptionState(state, '', true);
+  assert.deepEqual(state, { history: ['vorher', 'Ein sehr langer Satz endet jetzt.'], draft: '' });
+
+  state = nextCaptionState(state, '   ', true);
+  assert.deepEqual(state, { history: ['vorher', 'Ein sehr langer Satz endet jetzt.'], draft: '' });
+});
+
+test('scrollCaptionListToLatest moves the caption viewport to the newest rendered line', () => {
+  const captionList = { scrollHeight: 2345, scrollTop: 0 };
+
+  scrollCaptionListToLatest(captionList);
+
+  assert.equal(captionList.scrollTop, 2345);
 });
