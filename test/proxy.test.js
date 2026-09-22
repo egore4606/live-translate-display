@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import { once } from 'node:events';
 import WebSocket, { WebSocketServer } from 'ws';
-import { startProxyServer } from '../src/proxy.js';
+import { startProxyServer, normalizeAllowedOrigin } from '../src/proxy.js';
 
 async function listen(server) {
   server.listen(0, '127.0.0.1');
@@ -17,6 +17,14 @@ function nextMessage(socket) {
     socket.once('error', reject);
   });
 }
+
+test('allowed origin must be a canonical HTTP(S) origin', () => {
+  assert.equal(normalizeAllowedOrigin('https://translate.example'), 'https://translate.example');
+  assert.throws(() => normalizeAllowedOrigin('https://translate.example/'));
+  assert.throws(() => normalizeAllowedOrigin(' https://translate.example'));
+  assert.throws(() => normalizeAllowedOrigin('https://translate.example/path'));
+  assert.throws(() => normalizeAllowedOrigin('not-an-origin'));
+});
 
 test('proxy authenticates upstream by header and relays Live messages', async (t) => {
   let upstreamRequest;

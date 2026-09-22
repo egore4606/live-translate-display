@@ -6,6 +6,31 @@ const DEFAULT_UPSTREAM =
   'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent';
 const MAX_MESSAGE_BYTES = 2 * 1024 * 1024;
 
+export function normalizeAllowedOrigin(value) {
+  if (typeof value !== 'string' || value.length === 0 || value.trim() !== value) {
+    throw new Error('ALLOWED_ORIGIN must be an exact HTTP(S) origin without whitespace');
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error('ALLOWED_ORIGIN must be a valid HTTP(S) origin');
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)
+    || parsed.origin !== value
+    || parsed.username
+    || parsed.password
+    || parsed.pathname !== '/'
+    || parsed.search
+    || parsed.hash) {
+    throw new Error('ALLOWED_ORIGIN must contain only an exact HTTP(S) origin');
+  }
+
+  return parsed.origin;
+}
+
 function sendJson(socket, value) {
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(value));
@@ -151,10 +176,12 @@ export async function startProxyServer({
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const allowedOrigin = normalizeAllowedOrigin(process.env.ALLOWED_ORIGIN);
+
   const proxy = await startProxyServer({
     host: process.env.HOST || '127.0.0.1',
     port: Number(process.env.PORT || 3015),
-    allowedOrigin: process.env.ALLOWED_ORIGIN || 'https://egore4606.eu',
+    allowedOrigin,
   });
   console.log(`Live Translate proxy listening on ${proxy.host}:${proxy.port}`);
 }
