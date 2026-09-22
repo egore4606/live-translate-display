@@ -15,6 +15,12 @@ An iPad-first display for live Russian-to-German captions. Speak into the iPad m
 - Fullscreen and screen-wake-lock requests where the browser supports them.
 - Small Node.js WebSocket relay that keeps the Gemini API key out of the browser URL and forwards it only in the upstream request header.
 
+## Interface preview
+
+![Illustrative Live Translate Display preview](docs/assets/live-translate-preview.svg)
+
+*Illustrative preview of the iPad-facing caption screen. The shown German sentences are sample text, not a recording from a live session.*
+
 ## How it works
 
 ```text

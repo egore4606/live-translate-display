@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Live Translate Display interface preview</title>
+  <desc id="desc">Dark iPad-first caption display showing Russian to German live translation with large centered German text.</desc>
+  <defs>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0b0a"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8ff62" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#d8ff62" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#e8e9e4"/>
+  <ellipse cx="800" cy="922" rx="560" ry="34" fill="#171817" opacity=".22" filter="url(#shadow)"/>
+  <rect x="92" y="50" width="1416" height="900" rx="62" fill="#191a18" stroke="#383a35" stroke-width="8"/>
+  <rect x="116" y="74" width="1368" height="852" rx="42" fill="url(#screen)"/>
+  <circle cx="800" cy="94" r="6" fill="#4a4c47"/>
+  <path d="M118 116 Q118 74 160 74 H1020 L118 926Z" fill="url(#glow)" opacity=".28"/>
+
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect x="176" y="134" width="72" height="36" rx="18" fill="#1b2512" stroke="#58672a" stroke-width="2"/>
+    <text x="212" y="158" fill="#d8ff62" font-size="20" font-weight="900" letter-spacing="4" text-anchor="middle">DE</text>
+    <text x="274" y="158" fill="#a9aaa3" font-size="20">Gemini Live Translate · verbunden</text>
+    <rect x="1260" y="128" width="100" height="46" rx="12" fill="none" stroke="#2a2b29" stroke-width="2"/>
+    <text x="1310" y="157" fill="#f5f5f2" font-size="17" text-anchor="middle">Vollbild</text>
+    <rect x="1372" y="128" width="82" height="46" rx="12" fill="none" stroke="#532d2d" stroke-width="2"/>
+    <text x="1413" y="157" fill="#ff8c8c" font-size="17" text-anchor="middle">Stopp</text>
+
+    <text x="800" y="350" fill="#777971" font-size="43" font-weight="590" text-anchor="middle">Heute sprechen wir über eine Idee,</text>
+    <text x="800" y="410" fill="#777971" font-size="43" font-weight="590" text-anchor="middle">die Menschen und Sprachen verbindet.</text>
+
+    <text x="800" y="570" fill="#f5f5f2" font-size="76" font-weight="760" letter-spacing="-1.3" text-anchor="middle">Willkommen zu meiner</text>
+    <text x="800" y="665" fill="#f5f5f2" font-size="76" font-weight="760" letter-spacing="-1.3" text-anchor="middle">Präsentation auf Russisch.</text>
+
+    <line x1="470" y1="770" x2="1130" y2="770" stroke="#2a2b29" stroke-width="2"/>
+    <text x="800" y="824" fill="#61635d" font-size="17" text-anchor="middle">Live Übersetzung · русский → deutsch · Nur Text, keine Sprachausgabe</text>
+  </g>
+</svg>
