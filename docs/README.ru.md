@@ -15,6 +15,12 @@
 - Полноэкранный режим и запрос screen wake lock, если браузер поддерживает их.
 - Небольшой Node.js WebSocket relay, который не помещает ключ Gemini в URL браузера.
 
+## Визуальный preview
+
+![Пример экрана Live Translate Display](assets/live-translate-preview.svg)
+
+*Это иллюстративный preview интерфейса с демонстрационным немецким текстом, а не запись реальной сессии.*
+
 ## Быстрый запуск
 
 1. Откройте страницу через HTTPS в Safari на iPad.
