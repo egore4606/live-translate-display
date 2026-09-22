@@ -1,0 +1,21 @@
+name: Question
+description: Ask about setup or usage
+title: "question: "
+labels:
+  - "type: question"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never post an API key, cookie, recording, personal data, or private server information.
+  - type: textarea
+    id: question
+    attributes:
+      label: What would you like to know?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Include relevant browser/device and redacted error text.
